@@ -1,11 +1,12 @@
 ---
 name: ansh-review
-description: "Give an independent PASS, REVISE or DEBUG verdict on a task, a PR or a whole goal by rerunning its verification at the head SHA, checking it against the plan, rating blast radius and picking a merge lane. Use for /ansh-review task <id>, pr <n> or goal, from /ansh-cycle, /ansh-pr-loop or a loop."
+description: "Give an independent PASS, REVISE or DEBUG verdict on a task, a PR or a whole goal by rerunning its verification at the head SHA, checking it against the plan, rating blast radius and picking a merge lane; or harden a TDD through two independent cross-model review loops. Use for /ansh-review task <id>, pr <n>, goal or tdd <path>, from /ansh-cycle, /ansh-pr-loop or a loop."
 ---
 
 # /ansh-review
 
-**Goal:** an independent verdict with evidence. Never edit code.
+**Goal:** an independent verdict with evidence. Never edit code. (`tdd` mode edits the TDD file,
+nothing else.)
 
 **Uses:** [runtime](../_shared/runtime.md), [autonomy](../_shared/autonomy.md),
 [verification](../_shared/verification.md), [principles](../_shared/principles.md),
@@ -15,7 +16,8 @@ description: "Give an independent PASS, REVISE or DEBUG verdict on a task, a PR 
 [/thermo-nuclear-code-quality-review](../thermo-nuclear-code-quality-review/SKILL.md),
 [/ansh-debug](../ansh-debug/SKILL.md), [/ansh-plan](../ansh-plan/SKILL.md),
 [/ansh-correct](../ansh-correct/SKILL.md), [memory](../_shared/memory.md), [PR gate](references/gate.md),
-[blast radius](references/blast-radius.md), [output format](references/output.md).
+[blast radius](references/blast-radius.md), [output format](references/output.md),
+[TDD loops](references/tdd-loops.md).
 
 Review on a fresh-context Sonnet/Opus/Sol per runtime at high effort. The deep lane uses `xhigh`
 or the host's highest supported equivalent. Haiku/Luna are excluded from default routing;
@@ -38,6 +40,12 @@ mechanism only; they do not own a review lens. Preserve every required lens and 
   - At most two goal evaluations per goal ([autonomy](../_shared/autonomy.md#stop-conditions)).
     Count earlier ones from the ledger. A third call returns BLOCKED.
   - Every failure is an `ACT_ON` item routed to `ansh-plan` as new work.
+- **`tdd <path>`**: a design before any code exists. Run [TDD loops](references/tdd-loops.md)
+  instead of the steps below: Loop A on Codex, then Loop B on Opus, each a simplify pass then a
+  review pass per round, until a round comes back clean on both. You verify every reviewer claim
+  against the code and edit the TDD between passes. Then a coverage check against the tickets and
+  a legibility pass. Use it before `/ansh-plan` turns a TDD into packets, or whenever I hand you a
+  TDD to review.
 
 ## Steps
 
@@ -131,8 +139,12 @@ mechanism only; they do not own a review lens. Preserve every required lens and 
 | Dependency PR open or parked | `WAITING_ON`. Review anyway. |
 | Verification needs prod writes or a deploy | Don't. Mark the check skipped with the reason and set `parked: yes`. |
 | Someone else's PR | Read-only: no comments, no bookkeeping ([gate](references/gate.md)). |
+| `tdd`: TDD lives in Linear or Docs | Review a local export. Never save back without my yes. |
+| `tdd`: a model or `delegate_task` unavailable | BLOCKED for that loop. No silent model switch, no in-session substitute. |
+| `tdd`: 4 rounds without a clean round | Stop and check in: trend per round, what keeps coming up. |
+| `tdd`: a finding is a product or scope call | Add it to the TDD's open questions. Don't guess. |
 
 ## Output
 
 The block in [output](references/output.md), plus the principles that changed a call. End with
-**DONE** (verdict emitted) or **BLOCKED** (couldn't evaluate; say what's needed).
+**DONE** (verdict or TDD handoff emitted) or **BLOCKED** (couldn't evaluate; say what's needed).

@@ -45,6 +45,32 @@ GATE: <pr mode: worst severity, rows, reused from <sha> | fresh>
 The gate orchestrator fills `QUALITY` from the thermo-nuclear lens before returning the PR
 verdict. The `ansh-review` gate lens does not claim another lens's result.
 
+## TDD mode
+
+`tdd` mode doesn't use the verdict block. It ends with this handoff ([tdd loops](tdd-loops.md)):
+
+```
+MODE: tdd <path>
+RESULT: CONVERGED | CHECK_IN (round 4, not converged) | BLOCKED - <why>
+TASK: <the task line> | source: <tickets | TDD only>
+MODELS: loop A <provider/model/effort> | loop B <provider/model/effort>
+SNAPSHOTS: /tmp/<name>-original.md ... | findings log: /tmp/<name>-findings.md
+BLAST_RADIUS: low | medium | high - <why, and the lane its PRs will need>
+```
+
+Then, in plain language:
+
+1. **Results per round**, one table per loop: round, pass, findings, applied / accepted / rejected /
+   open.
+2. **What changed from the original and why**, grouped by section, not by round.
+3. **What Loop B caught that Loop A missed**, and every place Loop B reversed Loop A.
+4. **Accepted risks and judgment calls to check**: each with the reason and what would reopen it.
+5. **Still open**: open questions added to the TDD, legibility fixes that would change the design,
+   coverage gaps against the tickets.
+6. **Repeat classes**, if any.
+
+On CHECK_IN, lead with the trend per round and what's still coming up instead.
+
 ## PR comment
 
 Add or edit one comment starting `<!-- ansh-review:merge-call -->`. Write it in the PR's voice:
