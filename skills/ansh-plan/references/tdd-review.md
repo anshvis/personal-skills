@@ -1,13 +1,14 @@
-# TDD review loops
+# TDD review
 
-What `/ansh-review tdd <path>` runs: two independent review loops on a TDD, one per model family,
-then a legibility pass. Unlike the other modes, you edit something here: the TDD, and only the TDD.
-Never edit code, tickets or the team's copy of the doc.
+What `/ansh-plan tdd <path>` runs, and what step 2 runs before planning from a TDD: two independent
+review loops on the TDD, one per model family, then a legibility pass. You edit the TDD here, and
+only a local copy of it. Never edit code, tickets or the team's copy of the doc.
 
 ## Before round 1
 
 - **Local file only.** If the TDD lives in Linear or Google Docs, export it to a local markdown file
   and review that. Never save back to the team's doc without my yes. Hand back the diff instead.
+  Planning (step 2 onward) reads the reviewed copy.
 - **Write the task from the problem, not the design.** One or two lines: who has what problem, and
   what we want to be true after. Source it from the ticket, its parent and the Linear project, not
   from the TDD. If the only source is the TDD itself, say so in the handoff.
@@ -46,7 +47,9 @@ Never edit code, tickets or the team's copy of the doc.
 - Fix what's real and keep looping. Don't stop after one round to ask me which findings to fix.
 - A loop ends when both passes come back clean in the same round. A pass that led to any TDD edit
   isn't clean. If that hasn't happened after 4 rounds, stop and check in with me: show the trend per
-  round and what's still coming up.
+  round and what's still coming up. Inside a loop run (`/ansh-small-loop`, `/ansh-loop`) don't stop
+  the run: plan from the latest version, put the unresolved findings in `plan.md` as agent
+  defaults, and finish DONE_WITH_CONCERNS.
 
 ## Loop B
 
@@ -108,7 +111,7 @@ severe first, with evidence. Done when a pass finds nothing.
 1. **Coverage check (yours).** Read the source tickets once more. Every acceptance criterion maps to
    a TDD section, and the TDD holds nothing the tickets put out of scope. A gap is a finding: apply
    it and log it as `coverage`. Also rate the blast radius of what the TDD would ship
-   ([blast radius](blast-radius.md)), so the handoff says which lane its PRs will need.
+   ([blast radius](../../ansh-review/references/blast-radius.md)), so the handoff says which lane its PRs will need.
 2. **Legibility pass.** Two Codex readers in parallel, same brief:
    "Read <tdd path> as an engineer on this team who is new to this project. Judge it as writing, not
    as a design: don't review the design itself, and don't edit any files. List every term used
@@ -120,8 +123,33 @@ severe first, with evidence. Done when a pass finds nothing.
    Merge the two lists and apply the fixes. Wording only: if a fix would change what the design
    says, don't apply it. Log it as open. Then diff against the last loop snapshot to confirm only
    wording moved.
-3. **Log.** `ansh-log ansh-review tdd-review <CONVERGED|CHECK_IN|BLOCKED> --reason <r> --note
+3. **Log.** `ansh-log ansh-plan tdd-review <CONVERGED|CHECK_IN|BLOCKED> --reason <r> --note
    "<loop A rounds>/<loop B rounds>"`, plus one `tdd-finding` event per applied finding with a
    `--class` (reuse an existing class for the same mistake) and `--model`. A class seen twice goes in
    the handoff's repeat classes.
-4. **Hand off** per [output](output.md#tdd-mode).
+4. **Hand off** with the block below. Copy it to `.ansh/tdd-review.md` so step 2 can tell the TDD
+   was already reviewed.
+
+## Handoff
+
+```
+MODE: tdd <path>
+RESULT: CONVERGED | CHECK_IN (round 4, not converged) | BLOCKED - <why>
+TASK: <the task line> | source: <tickets | TDD only>
+MODELS: loop A <provider/model/effort> | loop B <provider/model/effort>
+SNAPSHOTS: /tmp/<name>-original.md ... | findings log: /tmp/<name>-findings.md
+BLAST_RADIUS: low | medium | high - <why, and the lane its PRs will need>
+```
+
+Then, in plain language:
+
+1. **Results per round**, one table per loop: round, pass, findings, applied / accepted / rejected /
+   open.
+2. **What changed from the original and why**, grouped by section, not by round.
+3. **What Loop B caught that Loop A missed**, and every place Loop B reversed Loop A.
+4. **Accepted risks and judgment calls to check**: each with the reason and what would reopen it.
+5. **Still open**: open questions added to the TDD, legibility fixes that would change the design,
+   coverage gaps against the tickets.
+6. **Repeat classes**, if any.
+
+On CHECK_IN, lead with the trend per round and what's still coming up instead.

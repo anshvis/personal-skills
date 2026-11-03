@@ -1,6 +1,6 @@
 ---
 name: ansh-plan
-description: "Turn a TDD, Linear ticket or prose goal into milestones and self-contained task packets, each with a red-first verification contract. Use for /ansh-plan, or when a loop needs a plan, a backfill or a replan."
+description: "Turn a TDD, Linear ticket or prose goal into milestones and self-contained task packets, each with a red-first verification contract; harden a TDD first through two cross-model review loops. Use for /ansh-plan, /ansh-plan tdd <path>, or when a loop needs a plan, a backfill or a replan."
 ---
 
 # /ansh-plan
@@ -11,13 +11,19 @@ description: "Turn a TDD, Linear ticket or prose goal into milestones and self-c
 [milestones](../_shared/milestones.md), [principles](../_shared/principles.md),
 [ledger](../_shared/ledger.md), [memory](../_shared/memory.md) (`../_shared/ansh-memory`), [runtime](../_shared/runtime.md),
 [stacking](../_shared/stacking.md), [tickets](../_shared/tickets.md), [packet template](references/packet.md),
-[plan.json](references/plan-json.md), `effort-dial`, `gold-star`, `lightweight-sql`,
+[plan.json](references/plan-json.md), [TDD review](references/tdd-review.md), `effort-dial`, `gold-star`, `lightweight-sql`,
 `/ansh-small-loop`, `/ansh-loop`.
 
 You write no code. Plan on Sonnet/Opus/Sol at high effort; a Deep goal uses `max` or the host's
 highest supported equivalent. Use focused advisor help per runtime when needed; Fable/Astra never
 own the plan or its child tasks. Take your time here: a sloppy plan makes every later round more
 expensive.
+
+## Modes
+
+- **`/ansh-plan <goal>`**: the steps below.
+- **`/ansh-plan tdd <path>`**: only [TDD review](references/tdd-review.md) on that TDD, then hand
+  off. No packets. Use it when I hand you a TDD to review.
 
 ## Steps
 
@@ -36,6 +42,9 @@ expensive.
      and you had to explore: save what you learned as a `workflow` draft with `--task` per memory.
 
 2. **Phase 0: milestones and TDD checks.**
+   - With a TDD that has no `.ansh/tdd-review.md` for its current version: run
+     [TDD review](references/tdd-review.md) first, then plan from the reviewed local copy. Its
+     changes go in the agent-drafted ticket comment below, never in the team's doc.
    - With a TDD: number AC, FM, D, Q and M IDs per [milestones](../_shared/milestones.md). Find the
      `Implementation milestones` section. Draft missing blocks from `PR order`, `File blast
      radius`, `Failure modes` and `Rollout`. Keep them in `plan.md` and post them as one comment on
@@ -153,12 +162,16 @@ Loops also send you architectural REVISE findings and tasks that hit the iterati
 | Re-entry change of direction widens scope past the ticket | Do this ticket's share. Create a ticket for the rest. |
 | Old plan lacks the three lists, milestones or Verification | Backfill them (steps 2, 3, 5), then challenge. |
 | No delegation for the challenge | In-session adversarial pass, `independence: in-session`. Never call it independent. |
+| TDD review: a model or `delegate_task` unavailable | BLOCKED for that loop. No silent model switch, no in-session substitute. |
+| TDD review: 4 rounds without a clean round | Standalone: stop and check in. Inside a loop: plan from the latest version, DONE_WITH_CONCERNS. |
+| TDD review: a finding is a product or scope call | Add it to the TDD's open questions; the plan takes an agent default for it. |
 | Asked to run it now | Hand the plan to the loop the scope gate picks. Don't dispatch from here. |
 
 ## Output
 
-`.ansh/plan.md`, `plan.json`, `tasks/*.md`, `discoveries.md`, `decisions.md`. Then report:
-inferred ACs first, task count by tier (Deep should be zero), the challenge outcome and what it
+`tdd` mode: the [TDD review](references/tdd-review.md#handoff) handoff, status **DONE** or
+**BLOCKED**. Otherwise `.ansh/plan.md`, `plan.json`, `tasks/*.md`, `discoveries.md`, `decisions.md`. Then report:
+the TDD review result if one ran, inferred ACs first, task count by tier (Deep should be zero), the challenge outcome and what it
 changed, the three lists, agent defaults, parked-at-merge tasks, and the next command
 (`/ansh-small-loop`, `/ansh-loop`, or `/ansh-task T1`).
 
