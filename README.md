@@ -41,6 +41,21 @@ a skill never changes the current model by declaring a tier. Missing services or
 fresh-review capability are reported explicitly. No tmux, `/meta` or provider defaults are
 installed by this setup.
 
+## Tools
+
+`tools/worktree-cleanup.py` removes git worktrees nothing is using, to reclaim disk on
+machines where agents leave many behind. Dry run by default; pass `--apply` to remove.
+It keeps dirty worktrees, the main checkout, locked or recently modified ones, anything a
+running process uses, and anything tied to a live, pinned, snoozed or open T3 thread.
+Branches are never deleted, and an unreferenced HEAD is saved as `cleanup-preserved/<sha>`
+first.
+
+```bash
+python3 tools/worktree-cleanup.py                        # dry run over T3 projects
+python3 tools/worktree-cleanup.py --repo ~/web-app       # or name repos explicitly
+python3 tools/worktree-cleanup.py --keep census --apply  # remove, keeping matches
+```
+
 ## Beacon (project memory)
 
 `setup.sh` also runs `beacon/setup.sh` (skip it with `--no-beacon`). It installs
