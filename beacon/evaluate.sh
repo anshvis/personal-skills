@@ -36,7 +36,13 @@ fi
 now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 # No --project: each trace's memory is scoped to the repo it ran in.
-if TYPESAFE_API_KEY="$key" "$BEACON" memory evaluations run --evaluator jev --since "$since" --limit "$limit" ${dry[@]+"${dry[@]}"}; then
+# Beacon's 10s default times out on large traces, and the 03:00 run often fires as the laptop wakes
+# before the network is up, so allow longer per call and retry once after a pause.
+evaluate() {
+  TYPESAFE_API_KEY="$key" "$BEACON" memory evaluations run --evaluator jev --since "$since" --limit "$limit" \
+    --timeout "${BEACON_EVAL_TIMEOUT:-90s}" ${dry[@]+"${dry[@]}"}
+}
+if evaluate || { say "retrying in 60s"; sleep 60; evaluate; }; then
   [ "${#dry[@]}" -eq 0 ] && printf '%s\n' "$now" > "$LAST"
   say "done since $since"
 else
