@@ -13,6 +13,7 @@ CRITERIA: <n met> / <n total>
 VERIFICATION: rerun <pass | fail> at <sha> | strength: <ok | weak: why it could pass while broken>
 LOOP_CLOSURE: closed - <criterion-to-evidence links and caller coverage> | open - <missing proof and next checks>
 QUALITY: thermo-nuclear <pass | revise | unavailable> - <report and reviewed SHA> | n/a (task, goal or gate lens)
+PREFLIGHT: clean | <n> predicted blockers | human-approval-required: <paths> | n/a (task, goal)
 SURFACE: declared <class> | diff <class> | <match | mismatch: files>
 KIND: setup | logic | wiring [mixed: ...]
 PLAN_GAP: none | small | large - <one line per gap, with ticket key or TDD section>

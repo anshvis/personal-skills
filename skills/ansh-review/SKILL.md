@@ -15,7 +15,8 @@ description: "Give an independent PASS, REVISE or DEBUG verdict on a task, a PR 
 [/thermo-nuclear-code-quality-review](../thermo-nuclear-code-quality-review/SKILL.md),
 [/ansh-debug](../ansh-debug/SKILL.md), [/ansh-plan](../ansh-plan/SKILL.md),
 [/ansh-correct](../ansh-correct/SKILL.md), [memory](../_shared/memory.md), [PR gate](references/gate.md),
-[blast radius](references/blast-radius.md), [output format](references/output.md).
+[blast radius](references/blast-radius.md), [bot pre-flight](references/bot-preflight.md),
+[output format](references/output.md).
 
 Review on a fresh-context Sonnet/Opus/Sol per runtime at high effort. The deep lane uses `xhigh`
 or the host's highest supported equivalent. Haiku/Luna are excluded from default routing;
@@ -25,9 +26,13 @@ mechanism only; they do not own a review lens. Preserve every required lens and 
 ## Modes
 
 - **`task <id>`**: one packet at its head SHA. Run the judgment steps below. `/ansh-cycle` calls it.
-- **`pr <n>`**: the PR review gate in [gate](references/gate.md): reuse rules, four lenses in fresh
+- **`pr <n>`**: the PR review gate in [gate](references/gate.md): reuse rules, five lenses in fresh
   subagents, one severity scale, the gate comment and head bookkeeping. The judgment steps run as
   one lens, `pr <n> gate`, at PR scope. `/ansh-pr-loop` calls it whenever the head moves.
+- **`pr <n> preflight`**: only the [bot pre-flight](references/bot-preflight.md) lens, at the local
+  head before a push. It predicts what the repo's review bot will block on or refuse to approve, so
+  the caller fixes it before the bot's round-trip. It posts nothing and keeps no bookkeeping. It
+  returns predicted-blocker rows and `PREFLIGHT`.
 - **`goal`**: the whole goal at the integration head (or the single PR's head). The loops call it
   once every task has passed. On top of the judgment steps:
   - Judge every `acceptance_criteria[]` item as written, not a paraphrase, plus

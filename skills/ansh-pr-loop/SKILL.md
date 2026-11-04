@@ -32,16 +32,22 @@ when the head hasn't moved.
    posts the gate and merge-call comments, and returns `VERDICT`, `MERGE_LANE`, `PARKED`,
    `WAITING_ON` and the gate rows. Keep them in the state file.
 4. **Fix the gate's findings.** Hand the rows the gate marks for fixing to `/ansh-resolve <n>` as
-   items. Then run `/ansh-review pr <n>` again with resolve's report: it does the head bookkeeping
+   items, the `bot-preflight` rows included. A `human-approval-required` row means the bot will
+   never approve this PR, so request a CODEOWNERS or human reviewer now instead of at merge time. Then run `/ansh-review pr <n>` again with resolve's report: it does the head bookkeeping
    and judges the fixed head, so its lane and park call reflect the fixed code.
 5. **Iterate.** Each iteration:
    1. Run one `/ansh-resolve` pass on the PR. It owns CI triage, comment triage, fixes, replies,
-      thread resolution and fix logging.
+      thread resolution and fix logging. **Pre-flight before every push of our own commits:** run
+      `/ansh-review pr <n> preflight` on the local head and fix its `likely` rows first, so the
+      bot reviews code that already passes what it checks. A merge of the base alone skips it.
    2. **vitalize-agent gate.** Find `vitalize-agent[bot]`'s review whose `commit_id` equals
       `headRefOid`. None yet: not converged; arm a one-off recheck 30 minutes after the push
       (`ScheduleWakeup` 1800s, or T3 `schedule_task` on this thread) on top of the watcher. It
-      left findings: `/ansh-resolve` fixes them like any review. It approved the head with no
-      open findings: passed.
+      left findings: `/ansh-resolve` fixes them like any review. For each blocking finding the
+      pre-flight didn't predict for that head, log a `bot-preflight-miss`
+      ([bot pre-flight](../ansh-review/references/bot-preflight.md#learning-from-misses)). It raised
+      a finding we already answered: post the pre-emptive reply from the gate row and resolve the
+      thread. It approved the head with no open findings: passed.
    3. **Stuck bot reviews.** For each bot review at `CHANGES_REQUESTED` whose findings all have a
       verified disposition, count consecutive iterations it stays stuck after the fix was pushed.
       At two, dismiss it ([GitHub recipes](../ansh-resolve/references/github.md)) and post the

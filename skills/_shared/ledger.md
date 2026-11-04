@@ -40,7 +40,7 @@ time, repo, branch, head SHA and cwd. A failed log write never fails the skill: 
 | `/ansh-plan` | plan written, challenge done (one event per agent default) |
 | `/ansh-cycle` | each round's verdict (attempt n, reason), BLOCKED at the budget |
 | `/ansh-task` | red check written, done (attempt n) |
-| `/ansh-review` | verdict per task, per PR gate, whole-goal verdict |
+| `/ansh-review` | verdict per task, per PR gate, whole-goal verdict; `bot-preflight-miss` per bot blocker the pre-flight didn't predict |
 | `/ansh-ship` | each PR opened or updated |
 | `/ansh-debug` | root cause confirmed, fix verified |
 | `/ansh-resolve` | each fix (with reason), dismissal, retry |
